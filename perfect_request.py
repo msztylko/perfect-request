@@ -3,7 +3,7 @@ from typing import Optional
 
 import requests
 from requests.adapters import HTTPAdapter
-from requests.exceptions import ConnectionError, ReadTimeout
+from requests.exceptions import ConnectionError, ReadTimeout, RequestException
 from requests.packages.urllib3.util.retry import Retry
 
 logger = logging.getLogger(__name__)
@@ -52,11 +52,11 @@ def get_request(url: str, session: requests.Session) -> Optional[requests.Respon
     except ReadTimeout:
         logger.exception(f"Read timed out on connection to {url}")
         return None
-    except Exception:
+    except RequestException:
         logger.exception(f"General error while connecting to {url}")
         return None
     else:
-        if response:
+        if response.ok:
             logger.info(f"Got correct response from {url}")
         else:
             logger.warning(f"Got incorrect response from {url}")
